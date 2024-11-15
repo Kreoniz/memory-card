@@ -17,7 +17,7 @@ interface IRover {
   cameras: ICamera[];
 }
 
-interface IPhoto {
+export interface IPhoto {
   id: number;
   sol: number;
   camera: ICamera;
@@ -26,6 +26,7 @@ interface IPhoto {
   rover: IRover;
 }
 
-export interface IPhotos {
-  photos: IPhoto[];
+export interface ICardProps {
+  imageUrl: string;
+  date: string;
 }
