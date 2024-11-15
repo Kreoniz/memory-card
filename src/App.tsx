@@ -30,11 +30,11 @@ export function App() {
   }, []);
 
   return (
-    <div>
-      <div className="text-xl font-bold">App</div>
+    <div className="py-4 px-2 md:px-4">
+      <div className="text-3xl font-bold mb-4 text-center">Rovertastic!</div>
       <div>
         {photos ? (
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
             {photos.map((photo) => (
               <Card
                 key={photo.id}
