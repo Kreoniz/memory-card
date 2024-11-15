@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMarsRoverPhotos } from "./api";
+import { getMarsRoverPhotos, getMarsRoverInfo } from "./api";
 import { IPhoto } from "./types";
 import { Card } from "./components/Card";
 
@@ -7,18 +7,26 @@ export function App() {
   const [photos, setPhotos] = useState<IPhoto[] | null>(null);
 
   const CARD_AMOUNT = 10;
-  const rover_name = "curiosity";
   useEffect(() => {
-    getMarsRoverPhotos(rover_name, CARD_AMOUNT)
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setPhotos(data.photos.slice(10));
-      })
-      .catch((error) => {
+    async function fetchData() {
+      try {
+        const roverInfoRes = await getMarsRoverInfo();
+        const roverInfo = await roverInfoRes.json();
+
+        const maxSol = roverInfo.rover.max_sol;
+        const randomSol = Math.floor(Math.random() * maxSol);
+
+        const photosRes = await getMarsRoverPhotos(CARD_AMOUNT, randomSol);
+        const photos = await photosRes.json();
+
+        const data = photos.photos.slice(0, CARD_AMOUNT);
+        setPhotos(data);
+      } catch (error) {
         console.error(error);
-      });
+      }
+    }
+
+    fetchData();
   }, []);
 
   return (
