@@ -5,6 +5,7 @@ import { Card } from "./components/Card";
 
 export function App() {
   const [photos, setPhotos] = useState<IPhoto[] | null>(null);
+  const [clickedItems, setClickedItems] = useState<number[]>([]);
 
   const CARD_AMOUNT = 10;
   useEffect(() => {
@@ -19,7 +20,10 @@ export function App() {
         const photosRes = await getMarsRoverPhotos(CARD_AMOUNT, randomSol);
         const photos = await photosRes.json();
 
-        const data = photos.photos.slice(0, CARD_AMOUNT);
+        const data = photos.photos
+          .slice(0, CARD_AMOUNT)
+          .map((photo: IPhoto) => ({ ...photo, wasClicked: false }));
+
         setPhotos(data);
       } catch (error) {
         console.error(error);
@@ -29,18 +33,53 @@ export function App() {
     fetchData();
   }, []);
 
+  function shuffle(array: IPhoto[] | null) {
+    if (!array) return [];
+
+    let currentIndex = array.length;
+    const newArray = array.slice();
+
+    while (currentIndex != 0) {
+      const randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+
+      [newArray[currentIndex], newArray[randomIndex]] = [
+        newArray[randomIndex],
+        newArray[currentIndex],
+      ];
+    }
+
+    return newArray;
+  }
+
+  function handleItemClick(id: number) {
+    if (clickedItems.find((clickedId) => clickedId === id)) {
+      console.log(id);
+      setClickedItems([]);
+    } else {
+      setClickedItems([...clickedItems, id]);
+
+      setPhotos(shuffle(photos));
+    }
+  }
+
   return (
     <div className="py-4 px-2 md:px-4">
-      <div className="text-3xl font-bold mb-4 text-center">Rovertastic!</div>
+      <header className="flex justify-between">
+        <h2 className="text-3xl font-bold mb-4 text-center">Rovertastic!</h2>
+        <div>Current streak: {clickedItems.length}</div>
+      </header>
       <div>
         {photos ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
             {photos.map((photo) => (
-              <Card
+              <button
+                type="button"
+                onClick={() => handleItemClick(photo.id)}
                 key={photo.id}
-                imageUrl={photo.img_src}
-                date={photo.earth_date}
-              />
+              >
+                <Card imageUrl={photo.img_src} date={photo.earth_date} />
+              </button>
             ))}
           </div>
         ) : (
