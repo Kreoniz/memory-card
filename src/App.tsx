@@ -6,6 +6,7 @@ import { Card } from "./components/Card";
 export function App() {
   const [photos, setPhotos] = useState<IPhoto[] | null>(null);
   const [clickedItems, setClickedItems] = useState<number[]>([]);
+  const [bestScore, setBestScore] = useState(0);
 
   const CARD_AMOUNT = 10;
   useEffect(() => {
@@ -54,7 +55,7 @@ export function App() {
 
   function handleItemClick(id: number) {
     if (clickedItems.find((clickedId) => clickedId === id)) {
-      console.log(id);
+      setBestScore(Math.max(clickedItems.length, bestScore));
       setClickedItems([]);
     } else {
       setClickedItems([...clickedItems, id]);
@@ -65,10 +66,15 @@ export function App() {
 
   return (
     <div className="py-4 px-2 md:px-4">
-      <header className="flex justify-between">
-        <h2 className="text-3xl font-bold mb-4 text-center">Rovertastic!</h2>
-        <div>Current streak: {clickedItems.length}</div>
+      <header className="flex justify-between items-center mb-4">
+        <h2 className="text-3xl font-bold text-center">Rovertastic!</h2>
+
+        <div className="font-bold">
+          <div>Best score: {bestScore}</div>
+          <div>Current score: {clickedItems.length}</div>
+        </div>
       </header>
+
       <div>
         {photos ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
