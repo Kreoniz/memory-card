@@ -21,10 +21,13 @@ export function App() {
         const photosRes = await getMarsRoverPhotos(CARD_AMOUNT, randomSol);
         const photos = await photosRes.json();
 
-        const data = photos.photos
+        const shuffledPhotos = shuffle(photos.photos);
+
+        const data = shuffledPhotos
           .slice(0, CARD_AMOUNT)
           .map((photo: IPhoto) => ({ ...photo, wasClicked: false }));
 
+        console.log(JSON.stringify(data, null, 2));
         setPhotos(data);
       } catch (error) {
         console.error(error);
@@ -84,7 +87,11 @@ export function App() {
                 onClick={() => handleItemClick(photo.id)}
                 key={photo.id}
               >
-                <Card imageUrl={photo.img_src} date={photo.earth_date} />
+                <Card
+                  imageUrl={photo.img_src}
+                  date={photo.earth_date}
+                  camera={photo.camera.full_name}
+                />
               </button>
             ))}
           </div>

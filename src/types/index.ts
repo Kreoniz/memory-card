@@ -29,4 +29,5 @@ export interface IPhoto {
 export interface ICardProps {
   imageUrl: string;
   date: string;
+  camera: string;
 }
