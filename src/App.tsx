@@ -27,7 +27,6 @@ export function App() {
           .slice(0, CARD_AMOUNT)
           .map((photo: IPhoto) => ({ ...photo, wasClicked: false }));
 
-        console.log(JSON.stringify(data, null, 2));
         setPhotos(data);
       } catch (error) {
         console.error(error);
