@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { getMarsRoverPhotos, getMarsRoverInfo } from "./api";
 import { IPhoto } from "./types";
 import { Card } from "./components/Card";
-import { QuestionIcon, CrossIcon } from "./components/icons";
+import { QuestionIcon, CrossIcon, PartyIcon } from "./components/icons";
+import toast, { Toaster } from "react-hot-toast";
+import { useCallback } from "react";
 
 export function App() {
   const [photos, setPhotos] = useState<IPhoto[] | null>(null);
@@ -11,30 +13,36 @@ export function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const CARD_AMOUNT = 10;
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const roverInfoRes = await getMarsRoverInfo();
-        const roverInfo = await roverInfoRes.json();
 
-        const maxSol = roverInfo.rover.max_sol;
-        const randomSol = Math.floor(Math.random() * maxSol);
+  const fetchData = useCallback(async () => {
+    try {
+      setPhotos(null);
 
-        const photosRes = await getMarsRoverPhotos(CARD_AMOUNT, randomSol);
-        const photos = await photosRes.json();
+      const roverInfoRes = await getMarsRoverInfo();
+      const roverInfo = await roverInfoRes.json();
 
-        const shuffledPhotos = shuffle(photos.photos);
+      const maxSol = roverInfo.rover.max_sol;
+      const randomSol = Math.floor(Math.random() * maxSol);
 
-        const data = shuffledPhotos
-          .slice(0, CARD_AMOUNT)
-          .map((photo: IPhoto) => ({ ...photo, wasClicked: false }));
+      const photosRes = await getMarsRoverPhotos(CARD_AMOUNT, randomSol);
+      const photos = await photosRes.json();
 
-        setPhotos(data);
-      } catch (error) {
-        console.error(error);
-      }
+      const shuffledPhotos = shuffle(photos.photos);
+
+      const data = shuffledPhotos
+        .slice(0, CARD_AMOUNT)
+        .map((photo: IPhoto) => ({ ...photo, wasClicked: false }));
+
+      setPhotos(data);
+
+      toast.success("Photos loaded!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Photos could not be loaded");
     }
+  }, []);
 
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -72,11 +80,38 @@ export function App() {
   function handleItemClick(id: number) {
     if (clickedItems.find((clickedId) => clickedId === id)) {
       setBestScore(Math.max(clickedItems.length, bestScore));
+      toast("You clicked the wrong card!");
+
       setClickedItems([]);
     } else {
-      setClickedItems([...clickedItems, id]);
+      if (clickedItems.length === CARD_AMOUNT - 1) {
+        setBestScore(CARD_AMOUNT);
 
-      setPhotos(shuffle(photos));
+        toast((t) => (
+          <div className="flex flex-col justify-center gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">You won!</span>
+              <PartyIcon width="24" height="24" />
+            </div>
+            <button
+              className="w-full p-2 border border-gray-200 hover:bg-gray-200 transition rounded-lg"
+              onClick={() => {
+                setClickedItems([]);
+
+                fetchData();
+
+                toast.dismiss(t.id);
+              }}
+            >
+              Start over
+            </button>
+          </div>
+        ));
+      } else {
+        setClickedItems([...clickedItems, id]);
+
+        setPhotos(shuffle(photos));
+      }
     }
   }
 
@@ -147,6 +182,8 @@ export function App() {
           </div>
         </div>
       </dialog>
+
+      <Toaster />
     </div>
   );
 }
