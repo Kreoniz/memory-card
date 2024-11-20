@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { getMarsRoverPhotos, getMarsRoverInfo } from "./api";
 import { IPhoto } from "./types";
 import { Card } from "./components/Card";
-import { QuestionIcon, CrossIcon, PartyIcon } from "./components/icons";
+import {
+  QuestionIcon,
+  CrossIcon,
+  PartyIcon,
+  ShuffleIcon,
+} from "./components/icons";
 import toast, { Toaster } from "react-hot-toast";
 import { useCallback } from "react";
 
@@ -120,7 +125,7 @@ export function App() {
       <header className="flex justify-between items-center mb-4">
         <h2 className="text-3xl font-bold text-center">Rovertastic!</h2>
 
-        <div className="font-bold flex gap-3 items-center">
+        <div className="font-bold flex gap-2 items-center">
           <div className="text-right">
             <div>Best score: {bestScore}</div>
             <div>Current score: {clickedItems.length}</div>
@@ -128,6 +133,19 @@ export function App() {
 
           <button type="button" onClick={() => setIsModalOpen(true)}>
             <QuestionIcon height="45" width="45" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setBestScore(Math.max(clickedItems.length, bestScore));
+
+              setClickedItems([]);
+
+              fetchData();
+            }}
+          >
+            <ShuffleIcon height="40" width="40" />
           </button>
         </div>
       </header>
