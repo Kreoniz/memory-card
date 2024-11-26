@@ -122,7 +122,7 @@ export function App() {
 
   return (
     <div className="py-4 px-2 md:px-4 relative h-full w-full">
-      <header className="flex justify-between items-center mb-4">
+      <header className="flex flex-col sm:flex-row gap-2 justify-between items-center mb-4">
         <h2 className="text-3xl font-bold text-center">Rovertastic!</h2>
 
         <div className="font-bold flex gap-2 items-center">
